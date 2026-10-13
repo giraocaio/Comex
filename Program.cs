@@ -1,14 +1,20 @@
 using System.Globalization;
 using System.Text;
+using Comex.Modelos;
+using Comex.Testes;
 
 Console.OutputEncoding = Encoding.UTF8;
 CultureInfo culturaBrasileira = new CultureInfo("pt-BR");
 
-// CPF -> nome do cliente; nome do produto -> preço.
-Dictionary<string, string> clientes = new Dictionary<string, string>();
-Dictionary<string, decimal> produtos = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-// Cada CPF tem sua própria lista. Um produto repetido representa outra unidade.
-Dictionary<string, List<string>> carrinhos = new Dictionary<string, List<string>>();
+// As chaves continuam iguais, mas os valores agora são objetos completos.
+Dictionary<string, Cliente> clientes = new Dictionary<string, Cliente>();
+Dictionary<string, Produto> produtos = new Dictionary<string, Produto>(StringComparer.OrdinalIgnoreCase);
+
+if (args.Contains("--testes"))
+{
+    TestesDoDominio.Executar();
+    return;
+}
 
 ExibirMenuDeOpcoes();
 
@@ -25,6 +31,7 @@ void ExibirMenuDeOpcoes()
         Console.WriteLine("5 - Ajustar preço de produto");
         Console.WriteLine("6 - Adicionar produto no carrinho");
         Console.WriteLine("7 - Fechar compra");
+        Console.WriteLine("8 - Demonstrar objetos da Semana 2");
         Console.WriteLine("-1 - Sair");
         Console.Write("Digite sua opção: ");
         string? entrada = Console.ReadLine();
@@ -51,6 +58,7 @@ void ExibirMenuDeOpcoes()
             case 5: AjustarPrecoDeProduto(); break;
             case 6: AdicionaProdutoNoCarrinho(); break;
             case 7: FechaCompra(); break;
+            case 8: TesteObjetos.Executar(); break;
             case -1:
                 Console.WriteLine("COMEX FINALIZADO!");
                 return;
@@ -82,8 +90,40 @@ void CadastraCliente()
         return;
     }
 
-    clientes.Add(cpf, nome);
-    carrinhos.Add(cpf, new List<string>());
+    string email = LerTexto("E-mail: ");
+    string profissao = LerTexto("Profissão: ");
+    string telefone = LerTexto("Telefone: ");
+    string rua = LerTexto("Rua: ");
+    if (!LerInteiroNaoNegativo("Número do endereço (0 para sem número): ", out int numero))
+        return;
+    string bairro = LerTexto("Bairro: ");
+    string cidade = LerTexto("Cidade: ");
+    string estado = LerTexto("Estado: ");
+    string complemento = LerTexto("Complemento (opcional): ");
+
+    if (email.Length == 0 || profissao.Length == 0 || telefone.Length == 0 ||
+        rua.Length == 0 || bairro.Length == 0 || cidade.Length == 0 || estado.Length == 0)
+    {
+        Console.WriteLine("Preencha todos os campos obrigatórios. Apenas o complemento é opcional.");
+        return;
+    }
+
+    Endereco endereco = new Endereco
+    {
+        Rua = rua,
+        Numero = numero,
+        Bairro = bairro,
+        Cidade = cidade,
+        Estado = estado,
+        Complemento = complemento
+    };
+    Cliente cliente = new Cliente(nome, cpf, endereco)
+    {
+        Email = email,
+        Profissao = profissao,
+        Telefone = telefone
+    };
+    clientes.Add(cpf, cliente);
     Console.WriteLine($"Usuário {nome} ({cpf}) cadastrado com sucesso.");
 }
 
@@ -94,9 +134,10 @@ void ListaClientes()
         Console.WriteLine("Nenhum cliente cadastrado.");
         return;
     }
-    foreach (var cliente in clientes)
+    foreach (Cliente cliente in clientes.Values)
     {
-        Console.WriteLine($"CPF: {cliente.Key} | Nome: {cliente.Value}");
+        cliente.ExibirDados();
+        Console.WriteLine();
     }
 }
 
@@ -113,10 +154,24 @@ void CadastraProduto()
         Console.WriteLine("Produto já cadastrado. Use a opção de ajustar preço.");
         return;
     }
-    if (!LerPreco("Preço do produto (ex.: 29,90): ", out decimal preco))
+    string descricao = LerTexto("Descrição do produto: ");
+    if (descricao.Length == 0)
+    {
+        Console.WriteLine("A descrição não pode ficar vazia.");
+        return;
+    }
+    if (!LerPreco("Preço unitário (ex.: 29,90): ", out decimal preco))
+        return;
+    if (!LerInteiroNaoNegativo("Quantidade cadastrada: ", out int quantidade))
         return;
 
-    produtos.Add(nome, preco);
+    Produto produto = new Produto(nome)
+    {
+        Descricao = descricao,
+        PrecoUnitario = preco,
+        Quantidade = quantidade
+    };
+    produtos.Add(produto.Nome, produto);
     Console.WriteLine($"Produto {nome} cadastrado com sucesso.");
 }
 
@@ -127,9 +182,10 @@ void ListaProdutos()
         Console.WriteLine("Nenhum produto cadastrado.");
         return;
     }
-    foreach (var produto in produtos)
+    foreach (Produto produto in produtos.Values)
     {
-        Console.WriteLine($"Produto: {produto.Key} | Preço: {Moeda(produto.Value)}");
+        produto.ExibirDados();
+        Console.WriteLine();
     }
 }
 
@@ -144,7 +200,7 @@ void AjustarPrecoDeProduto()
     if (!LerPreco("Novo preço (ex.: 29,90): ", out decimal preco))
         return;
 
-    produtos[nome] = preco;
+    produtos[nome].PrecoUnitario = preco;
     Console.WriteLine($"Preço do produto {nome} ajustado para {Moeda(preco)}.");
 }
 
@@ -163,8 +219,8 @@ void AdicionaProdutoNoCarrinho()
         return;
     }
 
-    carrinhos[cpf].Add(nome);
-    Console.WriteLine($"Produto {nome} adicionado ao carrinho de {clientes[cpf]} com sucesso.");
+    clientes[cpf].AdicionarProdutoAoCarrinho(produtos[nome]);
+    Console.WriteLine($"Produto {produtos[nome].Nome} adicionado ao carrinho de {clientes[cpf].Nome} com sucesso.");
 }
 
 void FechaCompra()
@@ -175,22 +231,20 @@ void FechaCompra()
         Console.WriteLine("Cliente não cadastrado.");
         return;
     }
-    List<string> carrinho = carrinhos[cpf];
-    if (carrinho.Count == 0)
+    Cliente cliente = clientes[cpf];
+    if (cliente.Carrinho.Count == 0)
     {
         Console.WriteLine("O carrinho está vazio.");
         return;
     }
 
-    decimal total = 0;
-    Console.WriteLine($"\nCarrinho de {clientes[cpf]}:");
+    Console.WriteLine($"\nCarrinho de {cliente.Nome}:");
     // A compra considera o preço atual do catálogo no momento do fechamento.
-    foreach (string nome in carrinho)
+    foreach (Produto produto in cliente.Carrinho)
     {
-        decimal preco = produtos[nome];
-        Console.WriteLine($"{nome}: {Moeda(preco)}");
-        total += preco;
+        Console.WriteLine($"{produto.Nome}: {Moeda(produto.PrecoUnitario)}");
     }
+    decimal total = cliente.CalcularTotalDoCarrinho();
     Console.WriteLine($"Total: {Moeda(total)}");
     Console.WriteLine("PAGAMENTO SIMULADO: use somente um número de cartão fictício.");
     string cartao = LerTexto("Número fictício do cartão (16 dígitos, ou Enter para cancelar): ")
@@ -208,7 +262,7 @@ void FechaCompra()
 
     Console.WriteLine($"Realizando pagamento de {Moeda(total)} no cartão {cartao}.");
     Console.WriteLine("Compra finalizada com sucesso (simulação, sem cobrança real).");
-    carrinho.Clear();
+    cliente.EsvaziarCarrinho();
 }
 
 string LerTexto(string mensagem)
@@ -241,6 +295,17 @@ bool LerPreco(string mensagem, out decimal preco)
     if (!valido || preco <= 0 || preco > 1000000 || decimal.Round(preco, 2) != preco)
     {
         Console.WriteLine("Preço inválido. Use um valor entre 0,01 e 1000000,00, com até 2 casas decimais e sem separador de milhar.");
+        return false;
+    }
+    return true;
+}
+
+bool LerInteiroNaoNegativo(string mensagem, out int numero)
+{
+    string entrada = LerTexto(mensagem);
+    if (!int.TryParse(entrada, out numero) || numero < 0)
+    {
+        Console.WriteLine("Valor inválido. Informe um número inteiro maior ou igual a zero.");
         return false;
     }
     return true;
