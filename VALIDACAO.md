@@ -1,14 +1,50 @@
-# Validação da Semana 2
+# Validação da Semana 3
 
-Validação realizada em **13/10/2026**.
+Verificação realizada em **20/10/2026**.
 
-## Compilação e execução
+## Resultado
 
-Todos os arquivos C# foram compilados com o compilador Roslyn do SDK .NET **8.0.415**, usando as referências do .NET **8.0.21**, nullable habilitado e avisos tratados como erros. A compilação terminou sem erros ou avisos. O executável foi rodado com o runtime .NET 8.0.21.
+Todos os arquivos C# foram compilados diretamente pelo **Roslyn do SDK .NET 8.0.415**, usando as referências do .NET 8.0.21, nullable habilitado e avisos tratados como erros. A compilação terminou **sem erros ou avisos**.
 
-O comando `dotnet build` não pôde ser concluído neste ambiente: a inicialização da CLI falha ao consultar informações do processo (`System.Diagnostics.Process.GetStat`). A compilação direta com o compilador do próprio SDK e a execução foram concluídas; isso não substitui a verificação do comando completo de build na máquina de entrega.
+O executável foi executado com o runtime **.NET 8.0.21**. Passaram **57 verificações**:
 
-Para reproduzir localmente com o SDK instalado:
+| Grupo | Quantidade | Código |
+| --- | --- | --- |
+| Regras herdadas da Semana 2 | 18 | `Testes/TestesDoDominio.cs` |
+| Herança, interface e catálogo com LINQ | 19 | `Testes/TestesSemana3.cs` |
+| Interação com o menu refatorado | 20 | `Testes/TestesDoConsole.cs` |
+
+## O que foi verificado
+
+As regras anteriores cobrem construtor obrigatório, campos do produto, associação de endereço, valores negativos, carrinhos independentes, cálculo de total, reajuste e proteção da coleção do carrinho.
+
+As 19 verificações da Semana 3 cobrem:
+
+1. Dados herdados e específicos de Eletronico.
+2. Dados herdados e específicos de Livro.
+3. Identificar cliente por nome e CPF por meio da interface.
+4. Identificar livro por nome e ISBN por meio da interface.
+5. Nome obrigatório nos dois subtipos.
+6. Rejeição de ISBN vazio ou nulo.
+7. Rejeição de páginas não positivas.
+8. Rejeição de voltagem não positiva.
+9. Rejeição de potência não positiva.
+10. Carrinho com os dois subtipos e reajuste posterior.
+11. Duplicidade entre tipos sem substituição do objeto original.
+12. Busca ignorando caixa e espaços externos.
+13. Busca inexistente.
+14. Rejeição de produto nulo no catálogo.
+15. Ordenação por nome, com acento e diferenças de caixa, segundo pt-BR.
+16. Ordenação numérica por preço e desempate por nome.
+17. Preservação do catálogo original ao ordenar.
+18. Ordenação considerando preço atualizado.
+19. Ordenação de catálogo vazio.
+
+Os 20 cenários de console executam o menu real com `Console.SetIn` e `Console.SetOut`, restaurando os fluxos ao final de cada cenário. Cobrem menu inválido, consultas vazias, cadastro completo do cliente, CPF duplicado/inválido, listagem polimórfica, identificação por interface, demonstração isolada, as duas ordenações, duplicidade entre tipos, compra com carrinho misto, cancelamento, cartão inválido, consultas inexistentes, campos específicos inválidos, preço/quantidade inválidos e fim da entrada durante cadastro.
+
+## Reproduzir localmente
+
+Com o SDK do .NET 8 instalado, na pasta que contém `comex.csproj`:
 
 ```sh
 dotnet build comex.csproj
@@ -16,59 +52,10 @@ dotnet run --project comex.csproj -- --testes
 dotnet run --project comex.csproj
 ```
 
-## Verificações das classes
+A opção 8 demonstra os conceitos sem alterar os cadastros. O README contém um roteiro completo para cadastro, ordenação, identificação e compra.
 
-As **18 verificações abaixo passaram**. Estão incluídas em `Testes/TestesDoDominio.cs` e são executadas com a opção de linha de comando `--testes`.
+## Limite da verificação do ambiente
 
-1. Produto não possui construtor sem nome.
-2. Produto rejeita nome vazio.
-3. Produto rejeita nome composto apenas de espaços.
-4. Produto rejeita nome nulo.
-5. Produto guarda nome, descrição, preço unitário e quantidade.
-6. Preço negativo é rejeitado sem modificar o valor anterior.
-7. Quantidade negativa é rejeitada sem modificar o valor anterior.
-8. Cliente guarda seus dados e a referência ao objeto Endereco associado.
-9. Endereco guarda suas seis propriedades.
-10. Cliente rejeita endereço nulo.
-11. Endereco rejeita número negativo.
-12. Carrinho vazio tem total zero.
-13. Carrinho rejeita produto nulo.
-14. Duas unidades somam os preços corretamente.
-15. Carrinhos de clientes distintos são independentes.
-16. Ajuste de preço no objeto Produto é refletido no total do carrinho.
-17. A coleção exposta do carrinho não permite alteração externa.
-18. Esvaziar o carrinho não altera os dados do produto no catálogo.
+A CLI do .NET não inicializa normalmente no ambiente de preparação: ocorre uma falha na consulta de informações do processo (`System.Diagnostics.Process.GetStat`). A tentativa de executar o MSBuild diretamente também falhou ao consultar o nome do processo.
 
-## Cenários de console
-
-Foram executados **27 cenários aprovados**, alimentando entradas no executável e verificando mensagens de saída e encerramento. O roteiro manual correspondente está no README; o harness de execução usado no ambiente de preparação não integra o projeto C#.
-
-1. Demonstração de Produto, Cliente e Endereco pela opção 8, sem incluir os exemplos nos cadastros.
-2. Menu inválido e listagens vazias.
-3. Cadastro e listagem de cliente com todos os dados.
-4. CPF duplicado e normalização da pontuação.
-5. CPF inválido e nome vazio.
-6. Cadastro de cliente incompleto não é salvo.
-7. Complemento opcional e endereço com número zero.
-8. Número de endereço negativo.
-9. Cadastro de produto completo e rejeição de duplicidade.
-10. Nome e descrição de produto vazios.
-11. Preço negativo.
-12. Preço zero.
-13. Preço não numérico.
-14. Preço com três casas decimais significativas.
-15. Preço com separador de milhar.
-16. Preço acima do limite.
-17. Quantidade negativa.
-18. Quantidade fracionária.
-19. Quantidade não numérica.
-20. Quantidade fora da faixa de int.
-21. Preço com ponto decimal e quantidade zero.
-22. Buscas de cliente e produto inexistentes.
-23. Carrinho vazio.
-24. Compra de duas unidades, reajuste posterior para R$ 25,50, total de R$ 51,00 e esvaziamento após pagamento simulado.
-25. Cancelamento e cartão inválido preservam o carrinho para nova tentativa.
-26. Carrinhos independentes de dois clientes.
-27. Fim da entrada durante um cadastro sem travar ou entrar em loop infinito.
-
-O cenário de compra também confirmou que a quantidade cadastrada permanece informativa: não há baixa de estoque nesta etapa.
+Por isso, não se afirma que `dotnet build` foi concluído aqui. Foram concluídas a compilação direta pelo compilador do SDK e a execução dos testes. O comando completo de build deve ser confirmado no computador de execução ou em um ambiente .NET convencional.

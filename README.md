@@ -1,155 +1,198 @@
-# Comex | Semana 2 — Orientação a objetos
+# Comex | Semana 3
 
-Aplicação de console em C# para as atividades da Semana 2 do Comex, no treinamento da Alura. Evolui o projeto da Semana 1 com classes, propriedades, construtores, métodos e associação entre objetos.
+Aplicação de console em C# para o treinamento Alura / SEFAZ. Esta entrega continua a Semana 2 e aplica **herança, interfaces, polimorfismo, organização em namespaces e ordenação com LINQ**.
 
-**Branch de entrega:** `Semana02-CaioGirao`, criada a partir de `semana-1`.
+**Branch:** `Semana3-CaioGirao`, criada a partir de `Semana02-CaioGirao`.
 
-## Requisitos implementados
+**Link da entrega:** https://github.com/giraocaio/Comex/tree/Semana3-CaioGirao
 
-| Atividade | Implementação |
+## Atividades atendidas
+
+| Requisito | Onde conferir |
 | --- | --- |
-| Criar a classe Produto | [Modelos/Produto.cs](Modelos/Produto.cs): `Nome`, `Descricao`, `PrecoUnitario` e `Quantidade` |
-| Instanciar um produto e exibir seus dados | [Testes/TesteObjetos.cs](Testes/TesteObjetos.cs), acessível pela opção **8** do menu |
-| Criar a classe Endereco | [Modelos/Endereco.cs](Modelos/Endereco.cs): `Bairro`, `Cidade`, `Complemento`, `Estado`, `Rua` e `Numero` |
-| Criar a classe Cliente | [Modelos/Cliente.cs](Modelos/Cliente.cs): `Nome`, `CPF`, `Email`, `Profissao`, `Telefone` e `Endereco` |
-| Associar cliente e endereço em uma classe de teste | `TesteObjetos` cria um `Endereco` e passa esse objeto ao construtor de `Cliente` |
-| Exigir nome na criação de Produto | Construtor `Produto(string nome)`, sem construtor vazio; rejeita nome nulo, vazio ou só com espaços |
-| Continuar o projeto anterior | Cadastros, listagens, ajuste de preço, carrinho e pagamento simulado continuam disponíveis |
+| Criar a branch a partir da Semana 2 | Histórico da branch `Semana3-CaioGirao` |
+| Organizar classes em pastas e namespaces | `Modelos`, `Interfaces`, `Menus`, `Servicos`, `Utilitarios` e `Testes` |
+| Criar Eletronico e Livro como subclasses de Produto | [Eletronico.cs](Modelos/Eletronico.cs) e [Livro.cs](Modelos/Livro.cs) |
+| Eletrônico com Voltagem e Potencia | Cadastro pela opção **9** e listagem pela opção **4** |
+| Livro com Isbn e TotalPaginas | Cadastro pela opção **10** e listagem pela opção **4** |
+| Interface que obriga a implementação de Identificar | [IIdentificavel.cs](Interfaces/IIdentificavel.cs), implementada por `Cliente` e `Livro` |
+| Identificar cliente com nome/CPF e livro com nome/ISBN | Opção **11**, usando uma coleção de `IIdentificavel` |
+| Refatorar o menu em classes com responsabilidades próprias | [MenuPrincipal.cs](Menus/MenuPrincipal.cs) e demais classes da pasta `Menus` |
+| Desafio: ordenar produtos por nome e preço com LINQ | Opções **12** e **13**, implementadas em [CatalogoProdutos.cs](Servicos/CatalogoProdutos.cs) |
 
-Os campos de texto usam `string`; quantidade e número do endereço usam `int`. O preço usa `decimal`, adequado aos valores monetários e mantido da Semana 1.
+Todos os tipos de produto compartilham o catálogo, o ajuste de preços e o carrinho. O nome do livro é representado pela propriedade `Nome`, herdada de `Produto`.
 
-## Abrir e executar no computador
+## Como baixar e executar
 
-É necessário ter o **SDK do .NET 8** instalado. O projeto não utiliza pacotes externos.
+É necessário ter o **SDK do .NET 8**. Não há pacotes externos nem banco de dados.
 
-### Se você já usa GitHub Desktop
+### GitHub Desktop
 
-1. Selecione o repositório **Comex**.
-2. Clique em **Fetch origin** para buscar as branches publicadas.
-3. Em **Current branch**, selecione **Semana02-CaioGirao**.
-4. Abra a pasta do repositório no VS Code por **File > Open Folder / Arquivo > Abrir Pasta**.
-5. Abra **Terminal > New Terminal / Novo Terminal** e execute os comandos abaixo na pasta que contém `comex.csproj`.
-
-### Se preferir baixar os arquivos
-
-1. Abra a [branch da Semana 2](https://github.com/giraocaio/Comex/tree/Semana02-CaioGirao).
-2. Clique em **Code > Download ZIP**.
-3. Extraia o ZIP antes de abrir o projeto.
-4. No VS Code, abra a pasta extraída que contém `comex.csproj` e abra um novo terminal.
+1. Selecione o repositório **Comex** e clique em **Fetch origin**.
+2. Em **Current branch**, selecione **Semana3-CaioGirao**.
+3. Abra a pasta do repositório no VS Code.
+4. Abra **Terminal > New Terminal / Novo Terminal**, na pasta que contém `comex.csproj`.
+5. Execute:
 
 ```sh
 dotnet build comex.csproj
 dotnet run --project comex.csproj
 ```
 
-No Visual Studio, abra `comex.csproj` e pressione **Ctrl+F5**.
+### Download ZIP
 
-Para clonar diretamente com Git:
+Abra o [link da branch](https://github.com/giraocaio/Comex/tree/Semana3-CaioGirao), clique em **Code > Download ZIP** e extraia o arquivo. No VS Code, abra a pasta extraída que contém `comex.csproj` e execute os comandos acima.
+
+### Clone pelo terminal
 
 ```sh
-git clone --branch Semana02-CaioGirao https://github.com/giraocaio/Comex.git
+git clone --branch Semana3-CaioGirao https://github.com/giraocaio/Comex.git
 cd Comex
 dotnet run --project comex.csproj
 ```
 
 ## Menu
 
-| Opção | Ação |
+| Opção | Funcionalidade |
 | --- | --- |
 | 1 | Cadastrar cliente com contato e endereço |
-| 2 | Listar todos os dados dos clientes |
-| 3 | Cadastrar produto com descrição, preço e quantidade |
-| 4 | Listar todos os dados dos produtos |
-| 5 | Ajustar preço de produto |
-| 6 | Adicionar uma unidade de produto ao carrinho do cliente |
-| 7 | Exibir carrinho, calcular total e simular pagamento |
-| 8 | Criar e exibir os objetos de demonstração da Semana 2 |
-| -1 | Exibir `COMEX FINALIZADO!` e encerrar |
+| 2 | Listar clientes |
+| 3 | Cadastrar produto comum |
+| 4 | Listar produtos com os campos específicos de cada tipo |
+| 5 | Ajustar preço de qualquer produto |
+| 6 | Adicionar uma unidade ao carrinho de um cliente |
+| 7 | Calcular o total e simular pagamento |
+| 8 | Demonstrar herança, interface, polimorfismo e LINQ com exemplos |
+| 9 | Cadastrar eletrônico |
+| 10 | Cadastrar livro |
+| 11 | Identificar clientes e livros cadastrados |
+| 12 | Listar produtos por nome, de A a Z |
+| 13 | Listar produtos por preço, do menor para o maior |
+| -1 | Encerrar com `COMEX FINALIZADO!` |
 
-## Como explicar a orientação a objetos
+## Organização e responsabilidades
 
-- **Classe:** define os dados e comportamentos. `Produto` é a classe; o caderno criado a partir dela é um objeto.
-- **Propriedades:** representam os dados do objeto, como `Descricao` e `Quantidade`.
-- **Construtor:** inicializa o objeto. `new Produto("Caderno")` fornece o nome obrigatório. `new Produto()` não compila, pois não existe construtor sem parâmetros.
-- **Associação:** a propriedade `Cliente.Endereco` guarda um objeto `Endereco`, com seus próprios campos.
-- **Métodos:** representam ações. `ExibirDados()` apresenta o objeto; `CalcularTotalDoCarrinho()` soma os produtos do cliente.
-- **Encapsulamento:** o nome do produto só pode ser definido no construtor; preço e quantidade rejeitam valores negativos; o carrinho é alterado pelos métodos do cliente.
-
-Os dicionários continuam no `Program.cs`, mas agora armazenam objetos: `Dictionary<string, Cliente>` e `Dictionary<string, Produto>`. Cada cliente mantém uma lista própria de produtos no carrinho.
-
-Exemplo presente na classe de demonstração:
-
-```csharp
-Produto produto = new Produto("Caderno")
-{
-    Descricao = "Caderno de 100 folhas",
-    PrecoUnitario = 25.50m,
-    Quantidade = 10
-};
-
-produto.ExibirDados();
-```
-
-O sufixo `m` indica um literal do tipo `decimal`.
-
-## Roteiro de demonstração para a monitoria
-
-Use dados fictícios. Os dados ficam em memória enquanto o programa está aberto.
-
-1. Escolha **8**. Confira os quatro campos do produto, os dados do cliente e os seis campos do endereço. Os objetos de exemplo não são adicionados aos cadastros do menu.
-2. Escolha **1** e preencha, na ordem solicitada:
-
-| Campo | Valor de exemplo |
+| Pasta / arquivo | Responsabilidade |
 | --- | --- |
-| CPF | `11111111111` |
-| Nome | `Ana Teste` |
-| E-mail | `ana@example.com` |
-| Profissão | `Professora` |
-| Telefone | `11900000000` |
-| Rua | `Rua de Exemplo` |
-| Número | `100` |
-| Bairro | `Centro` |
-| Cidade | `São Paulo` |
-| Estado | `SP` |
-| Complemento | `Sala 2` |
+| `Program.cs` | Iniciar a aplicação ou executar as verificações com `--testes` |
+| `Modelos` / `Comex.Modelos` | Representar Produto, Eletronico, Livro, Cliente e Endereco |
+| `Interfaces` / `Comex.Interfaces` | Declarar o contrato `IIdentificavel` |
+| `Menus` / `Comex.Menus` | Tratar as interações do usuário, divididas por assunto |
+| `Servicos` / `Comex.Servicos` | Manter o catálogo, buscar produtos e ordenar com LINQ |
+| `Utilitarios` / `Comex.Utilitarios` | Centralizar leitura, validação de entrada e formatação monetária |
+| `Testes` / `Comex.Testes` | Demonstrar os objetos e executar verificações das classes e do menu |
 
-3. Escolha **2** e confira todos os dados, incluindo o endereço associado.
-4. Escolha **3** e cadastre `Caderno`, descrição `100 folhas`, preço `29,90` e quantidade `10`.
-5. Escolha **4** e confira as quatro propriedades do produto.
-6. Escolha **5** e ajuste o preço de `Caderno` para `25,50`.
-7. Escolha **6**, informe o CPF e o produto. Repita para adicionar duas unidades.
-8. Escolha **7**, informe o CPF e confira o total de **R$ 51,00**. Use `0000000000000000` como cartão fictício.
-9. Repita **7**: o carrinho deve estar vazio após a simulação bem-sucedida.
-10. Digite **-1** e confira a mensagem de encerramento.
+`MenuPrincipal` exibe as opções e encaminha as ações. `MenuClientes` cuida do cadastro e da listagem de clientes; `MenuProdutos`, dos produtos e das listagens ordenadas; `MenuCompras`, do carrinho e do pagamento simulado; `MenuIdentificacoes`, da identificação via interface. Eles compartilham os mesmos cadastros em memória.
 
-Experimente também nome vazio, CPF repetido, produto inexistente, preço negativo, quantidade negativa e letras no menu. O programa deve informar o problema e retornar ao menu.
+## Conceitos que podem ser apresentados à monitoria
 
-## Testes executáveis
+**Herança:** `Eletronico : Produto` e `Livro : Produto` reutilizam nome, descrição, preço e quantidade. Seus construtores usam `base(nome)` para atender à exigência de nome criada na Semana 2.
 
-Para executar as 18 verificações das classes, sem entrar no menu:
+**Interface:** `IIdentificavel` declara `string Identificar()`. `Cliente` retorna nome e CPF; `Livro` retorna nome e ISBN. A opção 11 percorre uma `List<IIdentificavel>` e chama o método sem precisar decidir qual implementação executar.
+
+**Polimorfismo:** `Produto.ExibirDados()` é `virtual`. As subclasses usam `override`, chamam `base.ExibirDados()` e acrescentam seus campos. Assim, uma coleção de `Produto` exibe corretamente os dados de cada tipo real.
+
+**LINQ:** `OrderBy` ordena pelo nome ou pelo preço. Na ordenação por preço, `ThenBy` desempata pelo nome. O nome usa comparação em português do Brasil, ignorando diferenças de maiúsculas e minúsculas. `ToList()` materializa o resultado sem reorganizar o catálogo original.
+
+**Encapsulamento:** o dicionário do catálogo é privado. A inclusão ocorre por `Cadastrar`, que rejeita duplicidade sem substituir o produto existente. O carrinho continua pertencendo ao cliente.
+
+## Roteiro de apresentação e testes manuais
+
+### 1. Demonstração rápida
+
+Execute o projeto e escolha **8**. Serão criados um produto comum, um eletrônico, um livro e um cliente. Confira:
+
+- Eletrônico com voltagem e potência.
+- Livro com ISBN e total de páginas.
+- Identificação de cliente por nome/CPF e de livro por nome/ISBN.
+- Ordenação por nome: **Aprendendo C#, Caderno, Ventilador**.
+- Ordenação por preço: **Caderno, Aprendendo C#, Ventilador**.
+
+Os objetos dessa demonstração não são adicionados aos cadastros do menu. Para testar a interação completa, faça os cadastros abaixo na mesma execução.
+
+### 2. Cadastro dos três tipos
+
+Preencha primeiro os campos comuns, na ordem: nome, descrição, preço e quantidade. Depois informe os campos específicos, quando solicitados.
+
+| Opção | Nome | Descrição | Preço | Quantidade | Campos específicos |
+| --- | --- | --- | --- | --- | --- |
+| 9 | Ventilador | De mesa | 150 | 5 | Voltagem: 127; potência: 60,5 |
+| 10 | Aprendendo C# | Didático | 50 | 10 | ISBN: 9780000000002; páginas: 200 |
+| 3 | Caderno | 100 folhas | 25 | 20 | Nenhum |
+
+O ISBN acima é um identificador de exemplo, sem relação com uma obra real.
+
+Escolha **4** para conferir os campos herdados e específicos. Use **12** e **13** para comparar as duas ordenações. Os preços esperados na opção 13 são **R$ 25,00, R$ 50,00 e R$ 150,00**.
+
+### 3. Cliente e interface
+
+Na opção **1**, cadastre estes dados fictícios, na ordem solicitada:
+
+| Campo | Valor |
+| --- | --- |
+| CPF | 11111111111 |
+| Nome | Ana Teste |
+| E-mail | ana@example.com |
+| Profissão | Professora |
+| Telefone | 11900000000 |
+| Rua | Rua de Exemplo |
+| Número | 100 |
+| Bairro | Centro |
+| Cidade | São Paulo |
+| Estado | SP |
+| Complemento | Sala 2 |
+
+Escolha **11**. O cliente será identificado com nome e CPF, e o livro cadastrado será identificado com nome e ISBN. Produtos comuns e eletrônicos não implementam essa interface.
+
+### 4. Compra com subclasses
+
+1. Na opção **6**, adicione `Aprendendo C#` ao CPF `11111111111`.
+2. Repita a opção **6** para adicionar `Ventilador` ao mesmo CPF.
+3. Na opção **5**, ajuste `Aprendendo C#` para `25`.
+4. Na opção **7**, informe o CPF e confira o total de **R$ 175,00**.
+5. Informe `0000000000000000` como cartão fictício.
+6. Abra novamente a opção **7**: o carrinho deverá estar vazio.
+7. Encerre com **-1**.
+
+### 5. Casos inválidos
+
+Experimente cadastrar um produto com nome já utilizado, ISBN vazio, páginas iguais a zero, voltagem negativa, potência com letras, preço negativo e quantidade fracionária. O programa deve informar o problema, voltar ao menu e não salvar o cadastro incompleto.
+
+Também é possível cancelar a compra com Enter no campo de cartão. O carrinho deve ser preservado.
+
+## Verificações automatizadas
 
 ```sh
 dotnet run --project comex.csproj -- --testes
 ```
 
-O resultado esperado é **18 testes de domínio aprovados.** O código dessas verificações está em [Testes/TestesDoDominio.cs](Testes/TestesDoDominio.cs). É um executor simples incluído na própria aplicação, sem framework externo de testes.
+O comando executa os testes incluídos no projeto, sem instalar framework externo. O resultado esperado é:
 
-Também foram executados 27 cenários de console durante a preparação da entrega. Veja os resultados e o limite da verificação do ambiente em [VALIDACAO.md](VALIDACAO.md).
+```text
+18 testes de domínio aprovados.
+19 testes da Semana 3 aprovados.
+20 cenários de console aprovados.
+```
 
-## Regras e limites desta etapa
+São **57 verificações**, abrangendo regras anteriores, herança, interface, ordenação, cadastros e compra. Os cenários de console redirecionam entrada e saída para executar o próprio `MenuPrincipal` automaticamente. Uma falha interrompe a execução com uma exceção.
 
-- Os dados não são gravados em banco ou arquivo e são perdidos ao encerrar.
-- O CPF aceita pontuação e exige 11 dígitos; não verifica os dígitos verificadores. E-mail e telefone são obrigatórios no menu, sem validação de formato.
-- Apenas o complemento é opcional no cadastro do cliente. Número `0` representa endereço sem número.
-- Produto duplicado não é cadastrado. A busca ignora maiúsculas e minúsculas, mas distingue acentos.
-- No menu, preços devem ser positivos, até R$ 1.000.000,00, com até duas casas decimais significativas. Aceitam vírgula ou ponto decimal, sem separador de milhar.
-- A classe Produto impede preço negativo; um objeto recém-criado pode ter preço zero até receber um valor. A regra de preço positivo é aplicada no cadastro e no ajuste pelo menu.
-- `Quantidade` é um dado do cadastro. Esta etapa não controla estoque, reserva ou baixa de unidades ao comprar.
-- Cada inclusão no carrinho representa uma unidade. O total usa o preço atual dos objetos do catálogo, inclusive após reajustes.
-- O pagamento é simulado. Use somente um número fictício de 16 dígitos. Enter cancela e preserva o carrinho; um número inválido também preserva os itens; uma simulação bem-sucedida esvazia o carrinho.
-- Categoria, pedidos persistidos, banco de dados e integração de pagamento ficam fora do escopo desta entrega.
+A compilação direta com Roslyn e as 57 verificações foram executadas com sucesso. O build completo pela CLI precisa ser confirmado em um ambiente .NET convencional; a limitação do ambiente de preparação está descrita em [VALIDACAO.md](VALIDACAO.md).
+
+## Regras e limites
+
+- Os dados existem apenas em memória e são perdidos ao fechar o programa.
+- O CPF exige 11 dígitos e aceita pontuação, sem validar dígitos verificadores. E-mail e telefone exigem preenchimento, sem validar formato.
+- Complemento é opcional; número zero representa endereço sem número.
+- O catálogo usa o nome como chave, ignorando maiúsculas e minúsculas. Não é possível repetir o nome entre tipos diferentes de produto.
+- O ISBN exige texto não vazio, sem validação de formato ou dígito verificador. Páginas e voltagem são inteiros positivos; potência é um decimal positivo em watts.
+- No menu, o preço aceita vírgula ou ponto decimal, deve ser positivo, até R$ 1.000.000,00 e ter até duas casas decimais significativas. Não use separador de milhar.
+- A quantidade cadastrada é informativa. Não há reserva ou baixa de estoque.
+- Cada inclusão no carrinho representa uma unidade. O total considera o preço atual do produto, inclusive após ajustes.
+- O pagamento é simulado e usa apenas número fictício de 16 dígitos. Não existe integração bancária. Cancelamento ou número inválido preserva os itens; simulação bem-sucedida esvazia o carrinho.
 
 ## Referências
 
-- [C#: aplicando a Orientação a Objetos — Alura](https://cursos.alura.com.br/course/csharp-aplicando-orientacao-objetos)
-- [Entrega anterior — Semana 1](https://github.com/giraocaio/Comex/tree/semana-1)
+- [Namespaces e using — Microsoft](https://learn.microsoft.com/pt-br/dotnet/csharp/fundamentals/program-structure/namespaces)
+- [Herança — Microsoft](https://learn.microsoft.com/pt-br/dotnet/csharp/fundamentals/object-oriented/inheritance)
+- [OrderBy — Microsoft](https://learn.microsoft.com/pt-br/dotnet/api/system.linq.enumerable.orderby?view=net-8.0)
+- [Entrega da Semana 2](https://github.com/giraocaio/Comex/tree/Semana02-CaioGirao)

@@ -1,6 +1,8 @@
+using Comex.Interfaces;
+
 namespace Comex.Modelos;
 
-public class Cliente
+public class Cliente : IIdentificavel
 {
     private readonly List<Produto> carrinho = new List<Produto>();
 
@@ -47,6 +49,8 @@ public class Cliente
     {
         carrinho.Clear();
     }
+
+    public string Identificar() => $"Nome: {Nome} | CPF: {CPF}";
 
     public void ExibirDados()
     {
