@@ -42,7 +42,7 @@ public class Produto
         }
     }
 
-    public void ExibirDados()
+    public virtual void ExibirDados()
     {
         Console.WriteLine($"Produto: {Nome}");
         Console.WriteLine($"Descrição: {Descricao}");
