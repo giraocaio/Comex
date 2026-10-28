@@ -9,8 +9,9 @@ if (args.Contains("--testes"))
     TestesDoDominio.Executar();
     TestesSemana3.Executar();
     TestesDoConsole.Executar();
+    await TestesSemana4.ExecutarAsync();
     return;
 }
 
 MenuPrincipal menu = new MenuPrincipal();
-menu.ExibirMenuDeOpcoes();
+await menu.ExibirMenuDeOpcoesAsync();

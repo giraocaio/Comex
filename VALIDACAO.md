@@ -1,50 +1,87 @@
-# Validação da Semana 3
+# Validação da Semana 4
 
-Verificação realizada em **20/10/2026**.
+Verificação realizada em **28/10/2026**.
 
-## Resultado
+## Build completo
 
-Todos os arquivos C# foram compilados diretamente pelo **Roslyn do SDK .NET 8.0.415**, usando as referências do .NET 8.0.21, nullable habilitado e avisos tratados como erros. A compilação terminou **sem erros ou avisos**.
+Executado com **SDK .NET 8.0.415**, tendo como alvo `net8.0`:
 
-O executável foi executado com o runtime **.NET 8.0.21**. Passaram **57 verificações**:
+```sh
+dotnet build comex.csproj --configuration Release -p:TreatWarningsAsErrors=true --nologo
+```
+
+Resultado: **Build succeeded, 0 Warning(s), 0 Error(s)**. A restauração do projeto também foi concluída. Nesta entrega, a CLI funcionou e foi possível validar o build completo.
+
+## Testes automatizados
+
+Executado:
+
+```sh
+dotnet run --project comex.csproj --configuration Release --no-build -- --testes
+```
+
+Resultado: saída com código **0**, com **87 verificações aprovadas**:
 
 | Grupo | Quantidade | Código |
 | --- | --- | --- |
-| Regras herdadas da Semana 2 | 18 | `Testes/TestesDoDominio.cs` |
-| Herança, interface e catálogo com LINQ | 19 | `Testes/TestesSemana3.cs` |
-| Interação com o menu refatorado | 20 | `Testes/TestesDoConsole.cs` |
+| Regras de domínio da Semana 2 | 18 | `Testes/TestesDoDominio.cs` |
+| Herança, interface e LINQ da Semana 3 | 19 | `Testes/TestesSemana3.cs` |
+| Fluxos anteriores do menu | 20 | `Testes/TestesDoConsole.cs` |
+| HTTP, JSON, LINQ e menu da Semana 4 | 30 | `Testes/TestesSemana4.cs` |
 
-## O que foi verificado
+### Os 30 testes novos
 
-As regras anteriores cobrem construtor obrigatório, campos do produto, associação de endereço, valores negativos, carrinhos independentes, cálculo de total, reajuste e proteção da coleção do carrinho.
+1. HttpClient envia GET para `https://fakestoreapi.com/products`.
+2. Desserialização mapeia os campos e ignora informações extras.
+3. Preço decimal é preservado e descrição ausente recebe texto vazio.
+4. Lista vazia é aceita.
+5. JSON malformado é rejeitado.
+6. Corpo vazio é rejeitado.
+7. Raiz JSON nula é rejeitada.
+8. Objeto JSON em vez de lista é rejeitado.
+9. Item nulo na lista é rejeitado.
+10. Nome obrigatório ausente é rejeitado.
+11. Preço obrigatório ausente é rejeitado.
+12. Identificador obrigatório ausente é rejeitado.
+13. Nome vazio é rejeitado.
+14. Preço negativo é rejeitado.
+15. Identificador não positivo é rejeitado.
+16. Preço com tipo incompatível é rejeitado.
+17. Ordenações por nome e preço, desempates e preservação da origem.
+18. Ordenação numérica de preços 2, 10 e 100.
+19. HTTP 403 é tratado sem anunciar sucesso.
+20. HTTP 500 é tratado sem anunciar sucesso.
+21. Falha de rede é tratada.
+22. Timeout real do HttpClient é tratado, usando um handler que aguarda o cancelamento.
+23. Cancelamento solicitado é propagado pelo serviço.
+24. JSON inválido gera mensagem adequada no menu.
+25. Ordenação antes da primeira consulta orienta o usuário.
+26. Falha de atualização preserva a consulta anterior.
+27. Atualização válida vazia substitui os dados antigos.
+28. Menu principal consulta e ordena sem alterar o catálogo local; ordenar não dispara novas requisições.
+29. Erro HTTP devolve o controle ao menu principal.
+30. Demonstração offline é identificada e não preenche a lista da consulta real.
 
-As 19 verificações da Semana 3 cobrem:
+Os testes usam `HttpClient` com um `HttpMessageHandler` simulado. Isso permite reproduzir respostas e falhas sem depender da internet e não é evidência de sucesso da API externa real.
 
-1. Dados herdados e específicos de Eletronico.
-2. Dados herdados e específicos de Livro.
-3. Identificar cliente por nome e CPF por meio da interface.
-4. Identificar livro por nome e ISBN por meio da interface.
-5. Nome obrigatório nos dois subtipos.
-6. Rejeição de ISBN vazio ou nulo.
-7. Rejeição de páginas não positivas.
-8. Rejeição de voltagem não positiva.
-9. Rejeição de potência não positiva.
-10. Carrinho com os dois subtipos e reajuste posterior.
-11. Duplicidade entre tipos sem substituição do objeto original.
-12. Busca ignorando caixa e espaços externos.
-13. Busca inexistente.
-14. Rejeição de produto nulo no catálogo.
-15. Ordenação por nome, com acento e diferenças de caixa, segundo pt-BR.
-16. Ordenação numérica por preço e desempate por nome.
-17. Preservação do catálogo original ao ordenar.
-18. Ordenação considerando preço atualizado.
-19. Ordenação de catálogo vazio.
+## Consulta real à API
 
-Os 20 cenários de console executam o menu real com `Console.SetIn` e `Console.SetOut`, restaurando os fluxos ao final de cada cenário. Cobrem menu inválido, consultas vazias, cadastro completo do cliente, CPF duplicado/inválido, listagem polimórfica, identificação por interface, demonstração isolada, as duas ordenações, duplicidade entre tipos, compra com carrinho misto, cancelamento, cartão inválido, consultas inexistentes, campos específicos inválidos, preço/quantidade inválidos e fim da entrada durante cadastro.
+A aplicação compilada foi executada com a sequência de entradas **14, 15, -1**. A opção 14 enviou a consulta real. O resultado observado foi:
 
-## Reproduzir localmente
+```text
+Iniciando consulta de produtos...
+Não foi possível consultar a API: HTTP 403.
+Consulte a API pela opção 14 antes de ordenar os produtos externos.
+COMEX FINALIZADO!
+```
 
-Com o SDK do .NET 8 instalado, na pasta que contém `comex.csproj`:
+A execução terminou com código **0**. O erro HTTP foi tratado, nenhuma lista fictícia foi carregada como resposta real e o menu permaneceu utilizável. Uma consulta independente ao mesmo endereço também retornou HTTP 403 no ambiente de preparação.
+
+A consulta real bem-sucedida depende de a API permitir o acesso na rede de execução. A opção **17** demonstra o fluxo com dados fictícios e indica explicitamente que a resposta HTTP é simulada, sem acesso externo.
+
+## Reproduzir no computador
+
+Na pasta que contém `comex.csproj`, com o SDK do .NET 8 instalado:
 
 ```sh
 dotnet build comex.csproj
@@ -52,10 +89,4 @@ dotnet run --project comex.csproj -- --testes
 dotnet run --project comex.csproj
 ```
 
-A opção 8 demonstra os conceitos sem alterar os cadastros. O README contém um roteiro completo para cadastro, ordenação, identificação e compra.
-
-## Limite da verificação do ambiente
-
-A CLI do .NET não inicializa normalmente no ambiente de preparação: ocorre uma falha na consulta de informações do processo (`System.Diagnostics.Process.GetStat`). A tentativa de executar o MSBuild diretamente também falhou ao consultar o nome do processo.
-
-Por isso, não se afirma que `dotnet build` foi concluído aqui. Foram concluídas a compilação direta pelo compilador do SDK e a execução dos testes. O comando completo de build deve ser confirmado no computador de execução ou em um ambiente .NET convencional.
+Use 14 para consulta real, 15/16 para ordenar uma consulta bem-sucedida e 17 para a demonstração offline. O README traz o roteiro completo para a monitoria.
