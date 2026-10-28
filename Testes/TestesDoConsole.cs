@@ -18,7 +18,8 @@ public static class TestesDoConsole
             {
                 Console.SetIn(leitor);
                 Console.SetOut(escritor);
-                new MenuPrincipal().ExibirMenuDeOpcoes();
+                // Adaptador síncrono apenas para preservar este executor de regressão.
+                new MenuPrincipal().ExibirMenuDeOpcoesAsync().GetAwaiter().GetResult();
             }
             finally
             {
