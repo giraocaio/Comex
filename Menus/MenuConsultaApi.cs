@@ -24,6 +24,7 @@ public class MenuConsultaApi
             List<ProdutoApi> produtos = await servico.ConsultarAsync();
             ultimaConsulta = produtos;
             Console.WriteLine($"Consulta concluída: {produtos.Count} produto(s) recebido(s).");
+            Console.WriteLine($"JSON bruto salvo em: {servico.CaminhoJson}");
             ExibirProdutos(produtos);
         }
         catch (HttpRequestException erro)
@@ -42,6 +43,16 @@ public class MenuConsultaApi
         catch (JsonException)
         {
             Console.WriteLine("A API retornou um JSON inválido ou dados de produtos incompatíveis.");
+            InformarConsultaAnterior();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Console.WriteLine("Sem permissão para salvar produtos.json. Execute em uma pasta com permissão de escrita.");
+            InformarConsultaAnterior();
+        }
+        catch (IOException)
+        {
+            Console.WriteLine("Não foi possível gravar produtos.json. Verifique a pasta e tente novamente.");
             InformarConsultaAnterior();
         }
     }

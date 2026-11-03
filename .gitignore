@@ -4,3 +4,6 @@ obj/
 *.user
 *.suo
 TestResults/
+.nuget/
+/produtos.json
+/relatorio-produtos.csv

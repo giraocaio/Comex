@@ -21,12 +21,14 @@ public static class DemonstracaoApi
     {
         Console.WriteLine("\n=== DEMONSTRAÇÃO OFFLINE: RESPOSTA HTTP SIMULADA ===");
         Console.WriteLine("Dados fictícios. Esta demonstração não acessa a API real.");
+        using DiretorioTemporario pasta = new DiretorioTemporario();
         using HttpClient cliente = new HttpClient(new RespostaHttpSimulada((_, _) =>
             Task.FromResult(RespostaHttpSimulada.CriarJson(JsonExemplo))));
-        MenuConsultaApi menu = new MenuConsultaApi(new ProdutosApiServico(cliente));
+        MenuConsultaApi menu = new MenuConsultaApi(new ProdutosApiServico(cliente, Path.Combine(pasta.Caminho, "produtos.json")));
         await menu.ConsultarAsync();
         menu.ListarPorNome();
         menu.ListarPorPreco();
+        Console.WriteLine("O JSON da demonstração usa uma pasta temporária, removida ao finalizar.");
         Console.WriteLine("\nDemonstração offline concluída. A consulta real e o catálogo local não foram alterados.");
     }
 }

@@ -1,130 +1,155 @@
-# Comex | Semana 4
+# Comex | Semana 05
 
-Aplicação de console em C# do treinamento Alura / SEFAZ. Esta entrega continua a Semana 3 e acrescenta **consulta HTTP a uma API externa, tratamento de exceções, desserialização de JSON e ordenação com LINQ**.
+Aplicação de console em C# do treinamento Alura / SEFAZ. Esta entrega continua a Semana 4 com **persistência do JSON da API, biblioteca de relatórios, pacote NuGet local e exportação CSV com LINQ e polimorfismo**.
 
-**Branch:** `Semana4-CaioGirao`, criada a partir de `Semana3-CaioGirao`.
+**Autor:** Caio Girão
 
-**Link para entrega:** https://github.com/giraocaio/Comex/tree/Semana4-CaioGirao
+**Branch:** `Semana05-CaioGirao`, criada a partir de `Semana4-CaioGirao`.
+
+**Link para entrega:** https://github.com/giraocaio/Comex/tree/Semana05-CaioGirao
 
 ## Atividades atendidas
 
-| Atividade | Implementação |
+| Atividade | Onde conferir |
 | --- | --- |
-| Criar branch a partir da Semana 3 | Histórico da branch `Semana4-CaioGirao` |
-| Consultar API externa usando HttpClient | [ProdutosApiServico.cs](Servicos/ProdutosApiServico.cs), GET em `https://fakestoreapi.com/products` |
-| Acrescentar opção ao menu e imprimir o resultado | Opção **14**, que exibe os campos dos produtos recebidos |
-| Tratar falhas com try/catch | [MenuConsultaApi.cs](Menus/MenuConsultaApi.cs): erros HTTP/rede, timeout/cancelamento e JSON inválido |
-| Desserializar JSON em objetos C# | `JsonSerializer.Deserialize<List<ProdutoApi>>` e [ProdutoApi.cs](Modelos/ProdutoApi.cs) |
-| Ordenar produtos por título/nome e preço com LINQ | Opções **15** e **16**, com `OrderBy`, `ThenBy` e `ToList` |
+| Continuar a versão final da Semana 4 | Histórico da branch e [VALIDACAO.md](VALIDACAO.md) |
+| Criar Class Library `Comex.GeneradorRelatorio` | [Projeto da biblioteca](Comex.GeneradorRelatorio/Comex.GeneradorRelatorio.csproj) |
+| Interface com `string Exportar(IEnumerable<ProdutoRelatorioDto> produtos, string caminhoArquivo)` | [IGeradorRelatorio.cs](Comex.GeneradorRelatorio/IGeradorRelatorio.cs) |
+| Exportar CSV e retornar `Path.GetFullPath(caminhoArquivo)` | [GeradorCsv.cs](Comex.GeneradorRelatorio/GeradorCsv.cs) |
+| Documentação XML e metadados do pacote | Comentários públicos da biblioteca e propriedades do `.csproj` |
+| Gerar pacote automaticamente no build | `GeneratePackageOnBuild`, pacote [1.0.0](nuget-local/Comex.GeneradorRelatorio.1.0.0.nupkg) |
+| Configurar feed e consumir pacote NuGet | [NuGet.Config](NuGet.Config) e `PackageReference` em [comex.csproj](comex.csproj) |
+| Persistir JSON bruto antes da desserialização | [ProdutosApiServico.cs](Servicos/ProdutosApiServico.cs), opções **8** e **14** |
+| Menu de relatório herdando de `Menu` | [MenuGerarRelatorioCsv.cs](Menus/MenuGerarRelatorioCsv.cs), opção **18** |
+| Aplicar `Where`, `OrderByDescending` e `Select` | Filtro por preço positivo, ordem decrescente e projeção para DTO |
+| Usar interface e mostrar o caminho retornado | `IGeradorRelatorio gerador = new GeradorCsv()` e `caminhoSalvo` |
+| Registrar o menu no dicionário de `Program.cs` | `menus.Add(18, new MenuGerarRelatorioCsv())` |
 
-O resultado da API é convertido em objetos e apresentado com ID, nome, descrição e preço. Os campos `category`, `image` e `rating` não precisam ser mapeados para cumprir a atividade.
+O nome **GeneradorRelatorio** segue exatamente o enunciado. A biblioteca é consumida como pacote: não há `ProjectReference` entre o console e a biblioteca.
 
-## Como executar
+## Como abrir e executar no computador
 
-É necessário ter o **SDK do .NET 8**. Não há pacotes NuGet externos.
+Pré-requisito: **SDK do .NET 8**, incluindo as ferramentas de compilação.
 
-No GitHub Desktop, selecione **Comex**, clique em **Fetch origin** e escolha **Semana4-CaioGirao** em **Current branch**. Abra a pasta no VS Code e execute no terminal, dentro da pasta que contém `comex.csproj`:
+1. No GitHub Desktop, escolha o repositório **Comex** e clique em **Fetch origin**.
+2. Em **Current branch**, escolha **Semana05-CaioGirao**.
+3. Abra a pasta no VS Code ou no terminal. Você deve estar na pasta que contém `comex.csproj` e `NuGet.Config`.
+4. Execute:
 
 ```sh
 dotnet build comex.csproj
 dotnet run --project comex.csproj
 ```
 
-Também é possível abrir o [link da branch](https://github.com/giraocaio/Comex/tree/Semana4-CaioGirao), usar **Code > Download ZIP**, extrair o ZIP e abrir a pasta no VS Code.
+Outra opção é abrir o [link da branch](https://github.com/giraocaio/Comex/tree/Semana05-CaioGirao), selecionar **Code > Download ZIP**, extrair tudo e abrir a pasta extraída. Mantenha a pasta `nuget-local`: ela contém a dependência do console.
 
 Para clonar pelo terminal:
 
 ```sh
-git clone --branch Semana4-CaioGirao https://github.com/giraocaio/Comex.git
+git clone --branch Semana05-CaioGirao https://github.com/giraocaio/Comex.git
 cd Comex
 dotnet run --project comex.csproj
 ```
 
-## Novas opções do menu
+O pacote `Comex.GeneradorRelatorio.1.0.0.nupkg` está incluído no repositório para facilitar a avaliação. O restore encontra esse pacote no feed local automaticamente, sem publicação no nuget.org. O SDK precisa estar instalado, mas não é necessário acessar a internet para restaurar esse pacote ou rodar os testes.
 
-| Opção | Ação |
-| --- | --- |
-| 14 | Consultar a API real e exibir os produtos recebidos |
-| 15 | Ordenar a última consulta bem-sucedida por nome, de A a Z |
-| 16 | Ordenar a última consulta bem-sucedida por preço, do menor para o maior |
-| 17 | Demonstrar o fluxo com resposta HTTP simulada, sem internet |
+## Roteiro principal para testar/apresentar
 
-As opções **15** e **16** usam a lista já recebida, sem fazer novas chamadas HTTP. Para atualizar a lista, use novamente a opção **14**.
+1. Execute a aplicação na pasta do projeto.
+2. Selecione **8 — Consultar produtos da API e salvar JSON**.
+3. Se a API responder com sucesso, confira os produtos exibidos e o caminho de `produtos.json` informado no console.
+4. Abra esse arquivo: o texto é o JSON recebido, sem reserialização. Ele conserva campos externos que não são usados pelo DTO.
+5. Selecione **18 — Gerar relatório CSV do JSON salvo**.
+6. Confira a quantidade exportada e o caminho absoluto retornado pela biblioteca.
+7. Abra `relatorio-produtos.csv` em um editor ou em uma planilha. Ao importar manualmente, selecione **UTF-8**, separador **ponto e vírgula** e números em **português do Brasil**.
+8. Confira o cabeçalho `Id;Nome;Descricao;Preco`, os produtos com preço maior que zero e a ordem decrescente de preço.
+9. Encerre com **-1**, execute novamente e escolha **18**: o relatório pode ser gerado sem nova consulta, pois o JSON está no disco.
 
-A opção **17** é uma demonstração adicional, claramente identificada como offline. Ela utiliza dados fictícios no formato esperado da API e percorre o mesmo serviço de HTTP/desserialização e a mesma lógica de exibição/ordenação, por meio de um `HttpMessageHandler` simulado. Não substitui silenciosamente a consulta real nem modifica seus dados.
+Os caminhos padrão são relativos à **pasta de trabalho atual**, isto é, a pasta a partir da qual o programa foi iniciado. Nos comandos acima, é a raiz do projeto. Os caminhos absolutos são mostrados no console.
 
-## Roteiro para apresentar à monitoria
+Uma nova consulta bem-sucedida atualiza `produtos.json`. Uma nova exportação substitui `relatorio-produtos.csv`. Esses dois arquivos de execução não são versionados.
 
-1. Execute a aplicação e escolha **14**.
-2. Se a API responder com sucesso, confira a quantidade recebida e os campos exibidos de cada produto.
-3. Escolha **15** para ver os nomes em ordem alfabética.
-4. Escolha **16** para ver os preços em ordem crescente. Empates são resolvidos pelo nome e, depois, pelo ID.
-5. Volte à opção **14** para realizar outra consulta.
-6. Encerre com **-1** e confira a mensagem `COMEX FINALIZADO!`.
+## Teste offline, caso a API não esteja disponível
 
-Se ocorrer erro HTTP, falta de conexão, timeout ou resposta inválida, a aplicação deve informar o problema e voltar ao menu, sem apresentar uma consulta malsucedida como sucesso.
+Na consulta real em **03/11/2026**, a API respondeu **HTTP 403** neste ambiente. O erro foi tratado e a aplicação voltou ao menu. O sucesso da persistência HTTP foi verificado com respostas simuladas, sem afirmar que houve uma resposta real com produtos.
 
-### Disponibilidade da API e demonstração offline
+Para demonstrar a leitura de disco e a exportação sem depender da API, use o arquivo **explicitamente fictício** [Exemplos/produtos.simulados.json](Exemplos/produtos.simulados.json). Feche o programa antes de copiar. O comando abaixo substitui o JSON atual; se desejar preservá-lo, renomeie-o antes.
 
-Na verificação de **28/10/2026**, a chamada real feita pela aplicação retornou **HTTP 403 (Forbidden)** a partir do ambiente de preparação. O erro foi tratado e a aplicação continuou funcionando. Esse resultado não permite afirmar que a consulta real retornou produtos neste ambiente, nem prever a resposta na rede do professor.
+No PowerShell, dentro da pasta do projeto:
 
-Se a API também estiver indisponível na apresentação, a opção **17** permite demonstrar a desserialização e as duas ordenações com três produtos fictícios:
+```powershell
+Copy-Item Exemplos/produtos.simulados.json produtos.json
+dotnet run --project comex.csproj
+```
 
-| Produto | Preço informado |
-| --- | --- |
-| Zebra de brinquedo | 2,00 |
-| Livro de C# | 10,00 |
-| Abajur | 10,00 |
+No Linux/macOS:
 
-A ordem por nome será **Abajur, Livro de C#, Zebra de brinquedo**. A ordem por preço será **Zebra de brinquedo, Abajur, Livro de C#**. O empate de preço evidencia o uso de `ThenBy`.
+```sh
+cp Exemplos/produtos.simulados.json produtos.json
+dotnet run --project comex.csproj
+```
 
-A demonstração offline não preenche a lista da consulta real. Se nenhuma consulta real tiver sido concluída, as opções 15 e 16 continuarão orientando a usar a opção 14.
+Escolha **18**. O resultado esperado é:
 
-## Como explicar o código
-
-**HttpClient e async/await:** `ProdutosApiServico.ConsultarAsync` envia um GET para o endereço solicitado. O cliente HTTP padrão é compartilhado e tem timeout de 15 segundos. `await` aguarda a resposta antes de processar os dados e retornar ao menu.
-
-**Status HTTP:** `EnsureSuccessStatusCode()` transforma uma resposta HTTP de erro em `HttpRequestException`. Assim, uma página de erro HTTP não é tratada como uma lista de produtos.
-
-**Tratamento de exceções:** o `try/catch` no menu envolve a consulta, a desserialização e a apresentação. Captura `HttpRequestException`, `OperationCanceledException` e `JsonException`, mostrando mensagens adequadas para cada caso.
-
-**Desserialização:** `JsonSerializer.Deserialize` transforma o texto JSON em `List<ProdutoApi>`. Os atributos `JsonPropertyName` relacionam os nomes da API às propriedades em português:
-
-| JSON | Propriedade C# | Tipo |
+| Ordem | Produto | Preço |
 | --- | --- | --- |
-| `id` | `Id` | `int` |
-| `title` | `Nome` | `string` |
-| `price` | `PrecoUnitario` | `decimal` |
-| `description` | `Descricao` | `string` |
+| 1 | Monitor | 850,00 |
+| 2 | Mouse | 120,50 |
+| 3 | Livro de C# | 29,90 |
 
-ID, título e preço são obrigatórios. Uma lista vazia é válida; JSON nulo, formato incorreto, campos obrigatórios ausentes ou dados incompatíveis são tratados como erro. A descrição é opcional e recebe texto vazio quando ausente.
+O Caderno tem preço zero e fica fora do relatório, demonstrando o filtro `Where`. A descrição do Mouse contém aspas; a do Livro contém ponto e vírgula, demonstrando o escape correto no CSV.
 
-**LINQ:** `OrderBy` ordena pelo nome ou pelo preço numérico. `ThenBy` define os desempates. `ToList` materializa uma nova lista, preservando a ordem original da resposta. A comparação de nomes usa português do Brasil e ignora diferenças de maiúsculas e minúsculas.
+A opção **17** continua demonstrando uma resposta HTTP simulada da Semana 4. Ela usa um JSON temporário que é removido ao terminar e **não substitui** o `produtos.json` real nem alimenta a opção 18.
 
-**Separação de responsabilidades:** o serviço cuida da comunicação, desserialização e ordenação. `MenuConsultaApi` cuida das mensagens e mantém a última consulta válida. `MenuPrincipal` encaminha as opções. `ProdutoApi` representa os dados externos.
+## O que explicar ao professor
+
+- **Persistência:** após `EnsureSuccessStatusCode()` e a leitura da resposta, `File.WriteAllTextAsync` salva o JSON bruto. Só depois ocorre a desserialização. Uma resposta HTTP de erro não substitui o arquivo anterior. Um HTTP 200 com JSON inválido é salvo para inspeção, mas a desserialização informa o erro e o relatório recusa esse conteúdo.
+- **DTO:** `ProdutoApi` representa o formato externo. `ProdutoRelatorioDto` representa apenas o contrato necessário para exportar; a biblioteca não depende de `ProdutoApi`, de `Produto` nem dos menus.
+- **LINQ:** `Where` seleciona preços maiores que zero; `OrderByDescending` ordena pelo valor numérico; `ThenBy` desempata por ID; `Select` cria os DTOs do relatório. O filtro é uma escolha desta implementação porque o enunciado não define um critério específico.
+- **Polimorfismo:** o relatório chama `Exportar` por uma variável `IGeradorRelatorio`. Outro formato pode implementar essa mesma interface sem alterar o contrato existente. A escolha da implementação pode então ser trocada no ponto de composição.
+- **Herança:** `MenuGerarRelatorioCsv` herda de `Menu` e sobrescreve `ExecutarAsync`. `MenuPrincipal` executa as opções pelo tipo base. `MenuAcao` adapta as funções anteriores para o mesmo contrato.
+- **NuGet:** o console usa `PackageReference` para a versão 1.0.0. `NuGet.Config` configura o feed `nuget-local`; a biblioteca gera o `.nupkg` no build. O pacote contém DLL, XML de documentação e README.
+- **Retorno útil:** a biblioteca retorna `Path.GetFullPath(caminhoArquivo)` depois de gravar. O menu guarda esse retorno em `caminhoSalvo` e o exibe.
+- **Tratamento de falhas:** ausência do JSON, JSON inválido, falhas de leitura/gravação e falta de permissão têm mensagens próprias. O usuário volta ao menu.
+
+## Gerar novamente a biblioteca e o pacote
+
+Para demonstrar a criação automática do `.nupkg`, execute na raiz do projeto:
+
+```sh
+dotnet build Comex.GeneradorRelatorio/Comex.GeneradorRelatorio.csproj --configuration Release
+```
+
+Confira:
+
+- `nuget-local/Comex.GeneradorRelatorio.1.0.0.nupkg`;
+- `Comex.GeneradorRelatorio/bin/Release/net8.0/Comex.GeneradorRelatorio.xml`.
+
+O `.csproj` contém ID, título, versão, descrição, autores, `GenerateDocumentationFile`, `GeneratePackageOnBuild` e `PackageOutputPath`.
+
+O arquivo `NuGet.Config` configura a fonte apenas neste repositório. No Visual Studio, a fonte aparece como **ComexLocal** ao abrir o projeto. Se precisar cadastrá-la manualmente, use **Ferramentas > Gerenciador de Pacotes NuGet > Configurações > Fontes de pacote**, adicionando o caminho absoluto de `nuget-local`.
+
+Se modificar a biblioteca, incremente a versão no projeto dela, gere o pacote e atualize a versão do `PackageReference` no console. Isso evita reutilizar a versão antiga do cache. O console não recompila automaticamente o código da biblioteca, pois depende do pacote.
 
 ## Testes automatizados
-
-Execute:
 
 ```sh
 dotnet run --project comex.csproj -- --testes
 ```
 
-Resultado esperado:
+Resultado esperado: **105 verificações aprovadas**:
 
 ```text
 18 testes de domínio aprovados.
 19 testes da Semana 3 aprovados.
 20 cenários de console aprovados.
 30 testes da Semana 4 aprovados.
+18 testes da Semana 5 aprovados.
 ```
 
-São **87 verificações**, todas executadas com sucesso. Os 30 testes novos simulam respostas HTTP para testar sucesso, desserialização, ordenação, HTTP 403/500, falha de rede, timeout, cancelamento, dados inválidos e integração com o menu. Eles não dependem da disponibilidade da API real. As verificações anteriores continuam cobrindo clientes, produtos, herança, interfaces, carrinho e compra.
+Os testes usam pastas temporárias e respostas HTTP simuladas. Não alteram os arquivos de uso normal e não precisam da internet. Veja [VALIDACAO.md](VALIDACAO.md) para os cenários e resultados registrados.
 
-O **build completo foi concluído com zero erros e zero avisos**, usando o SDK .NET 8.0.415. Veja [VALIDACAO.md](VALIDACAO.md) para os resultados e o registro da consulta real.
-
-## Funcionalidades das semanas anteriores
+## Numeração do menu e funcionalidades anteriores
 
 | Opção | Ação |
 | --- | --- |
@@ -132,26 +157,21 @@ O **build completo foi concluído com zero erros e zero avisos**, usando o SDK .
 | 3 / 4 | Cadastrar produto comum e listar o catálogo local |
 | 5 | Ajustar preço de produto local |
 | 6 / 7 | Adicionar ao carrinho e simular pagamento |
-| 8 | Demonstrar herança e interfaces |
+| **8** | **Consultar a API e salvar JSON, conforme o enunciado da Semana 5** |
 | 9 / 10 | Cadastrar eletrônico e livro |
-| 11 | Identificar clientes e livros pela interface |
+| 11 | Identificar clientes e livros |
 | 12 / 13 | Ordenar produtos locais por nome e preço |
+| 14 | Mesmo fluxo da opção 8, mantendo o atalho da Semana 4 |
+| 15 / 16 | Ordenar a última consulta externa em memória por nome/preço crescente |
+| 17 | Demonstração HTTP offline da Semana 4 |
+| **18** | **Gerar relatório CSV a partir do JSON em disco** |
+| 19 | Demonstração de herança/interfaces, que antes estava na opção 8 |
 | -1 | Encerrar |
 
-O [README da Semana 3](https://github.com/giraocaio/Comex/blob/Semana3-CaioGirao/README.md) contém o roteiro dos cadastros e da compra.
-
-## Regras e limites
-
-- Produtos externos ficam em uma lista de consulta separada do catálogo local. Não são importados automaticamente nem adicionados ao carrinho.
-- Preços externos são exibidos como valores numéricos recebidos, sem conversão de moeda ou atribuição automática de R$.
-- Uma falha de atualização preserva a última consulta bem-sucedida e informa isso ao usuário. Uma resposta válida vazia substitui a lista anterior por uma lista vazia.
-- Dados e consultas ficam apenas em memória e são perdidos ao encerrar.
-- O pagamento local continua sendo uma simulação. Use somente dados fictícios. Não existe cobrança real ou integração bancária.
-- A quantidade do catálogo local continua informativa, sem controle de estoque.
+O catálogo local, clientes e carrinhos continuam somente em memória; o pagamento é uma simulação com dados fictícios. Os produtos externos não são importados automaticamente para o catálogo/carrinho. Os preços externos não recebem conversão de moeda nem indicação automática de reais.
 
 ## Referências
 
-- [Fake Store API](https://fakestoreapi.com/)
-- [HttpClient — Microsoft](https://learn.microsoft.com/en-us/dotnet/fundamentals/networking/http/httpclient)
-- [Desserialização com System.Text.Json — Microsoft](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/deserialization)
-- [Entrega da Semana 3](https://github.com/giraocaio/Comex/tree/Semana3-CaioGirao)
+- [Feed NuGet local — Microsoft](https://learn.microsoft.com/en-us/nuget/hosting-packages/local-feeds)
+- [Criação de pacote com MSBuild — Microsoft](https://learn.microsoft.com/en-us/nuget/create-packages/creating-a-package-msbuild)
+- [Entrega da Semana 4](https://github.com/giraocaio/Comex/tree/Semana4-CaioGirao)
