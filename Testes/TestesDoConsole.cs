@@ -51,7 +51,7 @@ public static class TestesDoConsole
             "Voltagem: 127 V", "Potência: 60,5 W", "ISBN: 9780000000002", "Total de páginas: 200", "Produto: Caderno");
         Verificar("Identificação dos cadastros pela interface", cliente + livro + "11\n-1\n",
             "Nome: Ana | CPF: 11111111111", "Nome: Aprendendo C# | ISBN: 9780000000002");
-        Verificar("Demonstração isolada dos cadastros", "8\n4\n11\n-1\n",
+        Verificar("Demonstração isolada dos cadastros", "19\n4\n11\n-1\n",
             "Voltagem: 127 V", "Total de páginas: 200", "Nome: Ana Teste | CPF: 11111111111",
             "LINQ por nome: Aprendendo C#, Caderno, Ventilador", "LINQ por preço: Caderno, Aprendendo C#, Ventilador",
             "Nenhum produto cadastrado.", "Nenhum cliente ou livro cadastrado para identificar.");

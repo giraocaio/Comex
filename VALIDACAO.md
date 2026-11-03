@@ -1,92 +1,81 @@
-# Validação da Semana 4
+# Validação da Semana 05
 
-Verificação realizada em **28/10/2026**.
+Data: **03/11/2026**. SDK **.NET 8.0.415**, runtime **8.0.21**, Linux.
 
-## Build completo
+## Base da entrega
 
-Executado com **SDK .NET 8.0.415**, tendo como alvo `net8.0`:
+- Origem: branch `Semana4-CaioGirao`, commit `939e5fd63874210aca9036e8f2d391dd510e9abe`.
+- Nova branch: `Semana05-CaioGirao`.
+- Antes das implementações, a base executou os 87 testes existentes e compilou com zero erros/avisos.
+
+## Compilação e consumo NuGet
+
+Comandos executados com o SDK local:
 
 ```sh
-dotnet build comex.csproj --configuration Release -p:TreatWarningsAsErrors=true --nologo
+dotnet build Comex.GeneradorRelatorio/Comex.GeneradorRelatorio.csproj -c Release -p:TreatWarningsAsErrors=true
+dotnet build comex.csproj -c Release -p:TreatWarningsAsErrors=true
+dotnet run --project comex.csproj -c Release --no-build -- --testes
 ```
 
-Resultado: **Build succeeded, 0 Warning(s), 0 Error(s)**. A restauração do projeto também foi concluída. Nesta entrega, a CLI funcionou e foi possível validar o build completo.
+Resultados:
+
+- Biblioteca: **0 erros, 0 avisos**; `.nupkg` gerado automaticamente no build.
+- Console: **0 erros, 0 avisos**; referência resolvida como pacote NuGet, sem `ProjectReference`.
+- Arquivo `obj/project.assets.json`: dependência `Comex.GeneradorRelatorio/1.0.0`, tipo `package`.
+- Pacote inspecionado: DLL e XML em `lib/net8.0`, README e metadados com ID, título, versão, descrição e autor.
+- Uma cópia limpa, sem `bin`, `obj` ou cache `.nuget`, restaurou o pacote a partir do feed versionado e compilou com **0 erros/avisos**.
 
 ## Testes automatizados
 
-Executado:
+**105 verificações aprovadas:** 18 de domínio, 19 da Semana 3, 20 de console, 30 da Semana 4 e 18 da Semana 5.
 
-```sh
-dotnet run --project comex.csproj --configuration Release --no-build -- --testes
-```
+Os 18 cenários novos verificam:
 
-Resultado: saída com código **0**, com **87 verificações aprovadas**:
+1. Persistência do texto JSON sem reserialização e desserialização preservada.
+2. Atualização do arquivo sem concatenar a resposta anterior.
+3. Gravação de um JSON inválido de HTTP 200 antes de tentar desserializar.
+4. HTTP 500 sem sobrescrever o arquivo existente.
+5. Falha de gravação do JSON tratada sem falso sucesso.
+6. Caminho absoluto, cabeçalho, acentos, BOM e biblioteca em assembly separado.
+7. Escape de aspas, ponto e vírgula e quebras de linha no CSV.
+8. Formatação numérica pt-BR mesmo com cultura de execução en-US.
+9. Proteção de texto com aparência de fórmula.
+10. Coleção vazia e substituição de arquivo CSV anterior.
+11. Rejeição de coleção nula e caminho vazio.
+12. Ausência do JSON com orientação para consultar a API.
+13. Leitura do disco, filtro, ordenação decrescente, projeção e exibição do caminho.
+14. Nenhum produto elegível: CSV com cabeçalho e mensagem clara.
+15. Rejeição de JSON malformado, raiz nula, item nulo e preço negativo; relatório anterior preservado.
+16. Falha ao gravar CSV com retorno ao menu.
+17. Integração via dicionário: opção 8 → opção 18 → saída.
+18. Demonstração offline sem sobrescrever o JSON real.
 
-| Grupo | Quantidade | Código |
-| --- | --- | --- |
-| Regras de domínio da Semana 2 | 18 | `Testes/TestesDoDominio.cs` |
-| Herança, interface e LINQ da Semana 3 | 19 | `Testes/TestesSemana3.cs` |
-| Fluxos anteriores do menu | 20 | `Testes/TestesDoConsole.cs` |
-| HTTP, JSON, LINQ e menu da Semana 4 | 30 | `Testes/TestesSemana4.cs` |
+A execução completa dos testes usa pastas temporárias, removidas ao terminar. As respostas HTTP são simuladas deliberadamente. O teste anterior da demonstração de herança foi atualizado da opção 8 para a 19; a funcionalidade continua sendo verificada.
 
-### Os 30 testes novos
+## Execução real do programa
 
-1. HttpClient envia GET para `https://fakestoreapi.com/products`.
-2. Desserialização mapeia os campos e ignora informações extras.
-3. Preço decimal é preservado e descrição ausente recebe texto vazio.
-4. Lista vazia é aceita.
-5. JSON malformado é rejeitado.
-6. Corpo vazio é rejeitado.
-7. Raiz JSON nula é rejeitada.
-8. Objeto JSON em vez de lista é rejeitado.
-9. Item nulo na lista é rejeitado.
-10. Nome obrigatório ausente é rejeitado.
-11. Preço obrigatório ausente é rejeitado.
-12. Identificador obrigatório ausente é rejeitado.
-13. Nome vazio é rejeitado.
-14. Preço negativo é rejeitado.
-15. Identificador não positivo é rejeitado.
-16. Preço com tipo incompatível é rejeitado.
-17. Ordenações por nome e preço, desempates e preservação da origem.
-18. Ordenação numérica de preços 2, 10 e 100.
-19. HTTP 403 é tratado sem anunciar sucesso.
-20. HTTP 500 é tratado sem anunciar sucesso.
-21. Falha de rede é tratada.
-22. Timeout real do HttpClient é tratado, usando um handler que aguarda o cancelamento.
-23. Cancelamento solicitado é propagado pelo serviço.
-24. JSON inválido gera mensagem adequada no menu.
-25. Ordenação antes da primeira consulta orienta o usuário.
-26. Falha de atualização preserva a consulta anterior.
-27. Atualização válida vazia substitui os dados antigos.
-28. Menu principal consulta e ordena sem alterar o catálogo local; ordenar não dispara novas requisições.
-29. Erro HTTP devolve o controle ao menu principal.
-30. Demonstração offline é identificada e não preenche a lista da consulta real.
-
-Os testes usam `HttpClient` com um `HttpMessageHandler` simulado. Isso permite reproduzir respostas e falhas sem depender da internet e não é evidência de sucesso da API externa real.
-
-## Consulta real à API
-
-A aplicação compilada foi executada com a sequência de entradas **14, 15, -1**. A opção 14 enviou a consulta real. O resultado observado foi:
+Entrada: `8`, `18`, `-1`, em uma pasta sem JSON prévio.
 
 ```text
-Iniciando consulta de produtos...
 Não foi possível consultar a API: HTTP 403.
-Consulte a API pela opção 14 antes de ordenar os produtos externos.
+Arquivo produtos.json não encontrado. Consulte a API pela opção 8 ou 14 primeiro.
 COMEX FINALIZADO!
 ```
 
-A execução terminou com código **0**. O erro HTTP foi tratado, nenhuma lista fictícia foi carregada como resposta real e o menu permaneceu utilizável. Uma consulta independente ao mesmo endereço também retornou HTTP 403 no ambiente de preparação.
+Processo encerrado com código **0**. A API externa não retornou produtos neste ambiente. O tratamento de erro foi verificado; o sucesso da persistência de uma resposta HTTP foi validado nos testes com `HttpMessageHandler` simulado.
 
-A consulta real bem-sucedida depende de a API permitir o acesso na rede de execução. A opção **17** demonstra o fluxo com dados fictícios e indica explicitamente que a resposta HTTP é simulada, sem acesso externo.
+## Execução offline do programa completo
 
-## Reproduzir no computador
+O exemplo `Exemplos/produtos.simulados.json` foi copiado para uma pasta de teste como `produtos.json`. O executável real recebeu `18` e `-1`.
 
-Na pasta que contém `comex.csproj`, com o SDK do .NET 8 instalado:
+Resultado: **3 produtos exportados**, caminho absoluto exibido, processo encerrado com código **0**. Conteúdo do CSV (aqui sem mostrar o BOM):
 
-```sh
-dotnet build comex.csproj
-dotnet run --project comex.csproj -- --testes
-dotnet run --project comex.csproj
+```csv
+Id;Nome;Descricao;Preco
+3;"Monitor";"Produto fictício";850,00
+4;"Mouse";"Modelo ""especial""";120,50
+2;"Livro de C#";"Dados fictícios; demonstração";29,90
 ```
 
-Use 14 para consulta real, 15/16 para ordenar uma consulta bem-sucedida e 17 para a demonstração offline. O README traz o roteiro completo para a monitoria.
+O Caderno de preço zero foi filtrado. Essa demonstração comprova o fluxo de leitura de disco e exportação usando o pacote local, sem depender da resposta da API real.

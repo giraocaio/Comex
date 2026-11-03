@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Comex.GeneradorRelatorio</PackageId>
+    <Title>Gerador de relatórios CSV do Comex</Title>
+    <Version>1.0.0</Version>
+    <Description>Biblioteca para exportar produtos em CSV por meio de uma interface, retornando o caminho absoluto do arquivo.</Description>
+    <Authors>Caio Girão</Authors>
+    <PackageOutputPath>../nuget-local</PackageOutputPath>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

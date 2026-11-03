@@ -1,0 +1,6 @@
+[
+  { "id": 1, "title": "Caderno", "price": 0, "description": "Fora do filtro: preço zero" },
+  { "id": 2, "title": "Livro de C#", "price": 29.90, "description": "Dados fictícios; demonstração" },
+  { "id": 3, "title": "Monitor", "price": 850, "description": "Produto fictício" },
+  { "id": 4, "title": "Mouse", "price": 120.50, "description": "Modelo \"especial\"" }
+]

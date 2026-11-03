@@ -16,11 +16,13 @@ public class ProdutosApiServico
     private static readonly StringComparer comparadorNomes =
         StringComparer.Create(CultureInfo.GetCultureInfo("pt-BR"), ignoreCase: true);
     private readonly HttpClient cliente;
+    public string CaminhoJson { get; }
 
     // Um cliente alternativo permite testar respostas sem depender da internet.
-    public ProdutosApiServico(HttpClient? cliente = null)
+    public ProdutosApiServico(HttpClient? cliente = null, string caminhoJson = "produtos.json")
     {
         this.cliente = cliente ?? clienteCompartilhado;
+        CaminhoJson = Path.GetFullPath(caminhoJson);
     }
 
     public async Task<List<ProdutoApi>> ConsultarAsync(CancellationToken cancellationToken = default)
@@ -29,6 +31,13 @@ public class ProdutosApiServico
         resposta.EnsureSuccessStatusCode();
 
         string json = await resposta.Content.ReadAsStringAsync(cancellationToken);
+        // Persiste o texto recebido antes de desserializar, inclusive se o JSON for inválido.
+        await File.WriteAllTextAsync(CaminhoJson, json, cancellationToken);
+        return DesserializarProdutos(json);
+    }
+
+    public static List<ProdutoApi> DesserializarProdutos(string json)
+    {
         List<ProdutoApi>? produtos = JsonSerializer.Deserialize<List<ProdutoApi>>(json);
 
         if (produtos == null || produtos.Any(produto => produto == null ||
